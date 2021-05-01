@@ -75,8 +75,8 @@
             <!--end of col-->
         </div>
         <br>
-        <p>Only available center(s) will be displayed.</p>
-        <div id="tablediv" class="table-responsive">
+		<p>Only available center(s) will be displayed.</p>
+        <div id="tablediv" class="table-responsive d-none">
             <table id="table" class="table-striped border-success">
                 <thead>
                     <tr>
@@ -136,7 +136,7 @@
                                 }
                             });
                         });
-                        // $("#tablediv").removeClass('d-none');
+                        $("#tablediv").removeClass('d-none');
                         $('#table').bootstrapTable("load", availabilityData);
                     } else {
                         alert("Center(s) not available!");
