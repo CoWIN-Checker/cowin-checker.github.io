@@ -2,9 +2,9 @@
 <html lang="en">
 
 <head>
-    <title>Check CoWIN vaccine slot(s) availability</title>
-    <meta name="description" content="Quick way to check CoWIN vaccine slot(s) availability.">
+    <title>Check CoWIN vaccine center(s) availability</title>
     <meta charset="utf-8" />
+    <meta name="description" content="Quick way to check CoWIN vaccine center(s) availability.">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet"
@@ -15,68 +15,43 @@
         crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.css" />
     <script src="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.js"></script>
-    <!------ Include the above in your HEAD tag ---------->
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css"
-        integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous" />
-    <style>
-        .form-control-borderless {
-            border: none;
-        }
-
-        .form-control-borderless:hover,
-        .form-control-borderless:active,
-        .form-control-borderless:focus {
-            border: none;
-            outline: none;
-            box-shadow: none;
-        }
-    </style>
 </head>
 
 <body>
     <div class="container">
         <br />
         <div class="page-header">
-            <h2>Check CoWIN vaccine slot(s) availability</h2>
+            <h2>Check CoWIN vaccine center(s) availability</h2>
         </div>
         <br />
-        <div class="row">
-            <div class="col-12 col-md-10 col-lg-7">
-                <form class="card card-sm">
-                    <div class="card-body row no-gutters align-items-center">
-                        <!-- <div class="col-auto">
-                        <i class="fas fa-search h4 text-body"></i>
-                    </div> -->
-                        <!--end of col-->
-                        <div class="col">
-                            <input id="pincode" class="form-control form-control-lg form-control-borderless"
-                                type="search" placeholder="Enter pin code" />
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label">Age:</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="age" id="age18" value="18" checked />
-                            <label class="form-check-label" for="age18">18+</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="age" id="age45" value="45" />
-                            <label class="form-check-label" for="age45">45+</label>
-                        </div>
-                        <!--end of col-->
-                        <div class="col-auto">
-                            <button id="btnCheckAvailability" class="btn btn-lg btn-success" type="button">
-                                Check availability
-                            </button>
-                        </div>
-                        <!--end of col-->
+        <form>
+            <div class="form-row align-items-center">
+                <div class="col-auto">
+                    <input id="pincode" class="form-control mb-3" type="text" placeholder="Pincode" />
+                </div>
+                <div class="col-auto">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label mb-3">Age</label>
                     </div>
-                </form>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input mb-3" type="radio" name="age" id="age18" value="18" checked />
+                        <label class="form-check-label mb-3" for="age18">18+</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input mb-3" type="radio" name="age" id="age45" value="45" />
+                        <label class="form-check-label mb-3" for="age45">45+</label>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <button id="btnCheckAvailability" class="btn btn-success mb-3" type="button">Check
+                        availability</button>
+                </div>
             </div>
-            <!--end of col-->
+        </form>
+        <p>Only available center(s) will be displayed.</p>
+        <div id="notAvailableMessage" class="alert alert-danger d-none" role="alert">
+            Center not available!
         </div>
-        <br>
-		<p>Only available center(s) will be displayed.</p>
         <div id="tablediv" class="table-responsive d-none">
             <table id="table" class="table-striped border-success">
                 <thead>
@@ -111,6 +86,7 @@
                 pincode +
                 "&date=" +
                 date;
+            var availabilityData = [];
 
             $.ajax({
                 method: "GET",
@@ -119,7 +95,6 @@
                 dataType: 'json',
                 success: function (responseJson) {
                     if (responseJson.centers) {
-                        var availabilityData = [];
                         var centers = responseJson["centers"];
                         var age = document.getElementById("age18").checked ? 18 : 45;
                         centers.forEach((center) => {
@@ -137,11 +112,16 @@
                                 }
                             });
                         });
-                        $("#tablediv").removeClass('d-none');
-                        $('#table').bootstrapTable("load", availabilityData);
-                    } else {
-                        alert("Center(s) not available!");
                     }
+
+                    if (availabilityData.length == 0) {
+                        $("#notAvailableMessage").removeClass('d-none');
+                        $("#tablediv").addClass('d-none');
+                    } else {
+                        $("#notAvailableMessage").addClass('d-none');
+                        $("#tablediv").removeClass('d-none');
+                    }
+                    $('#table').bootstrapTable("load", availabilityData);
                 },
                 error: function (jqxhr, textStatus, error) {
                     if (jqxhr.status == 400) {
@@ -152,6 +132,32 @@
                 }
             })
         });
+
+    $(document).ready(function () {
+        var url = new URL(document.location);
+        var params = url.searchParams;
+        var pincode = params.get("pincode");
+        if (pincode) {
+            $("#pincode").val(pincode);
+        }
+        var age = params.get("age");
+        if (age && age == 45) {
+            document.getElementById("age45").checked = true;
+        }
+        var check = params.get("check");
+        if (check) {
+            $("#btnCheckAvailability").click();
+        }
+
+        $('#pincode').keypress(function (e) {
+            var key = e.which;
+            if (key == 13)  // the enter key code
+            {
+                $("#btnCheckAvailability").click();
+                return false;
+            }
+        });
+    });
 </script>
 
 </html>
