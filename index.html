@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Check covid vaccine availability for 18+</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet"
+        id="bootstrap-css" />
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"
+        integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ=="
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.css" />
+    <script src="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.js"></script>
+    <!------ Include the above in your HEAD tag ---------->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css"
+        integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous" />
+    <style>
+        .form-control-borderless {
+            border: none;
+        }
+
+        .form-control-borderless:hover,
+        .form-control-borderless:active,
+        .form-control-borderless:focus {
+            border: none;
+            outline: none;
+            box-shadow: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <br />
+        <div class="page-header">
+            <h2>Check CoWIN vaccine slots availability</h2>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-12 col-md-10 col-lg-7">
+                <form class="card card-sm">
+                    <div class="card-body row no-gutters align-items-center">
+                        <!-- <div class="col-auto">
+                        <i class="fas fa-search h4 text-body"></i>
+                    </div> -->
+                        <!--end of col-->
+                        <div class="col">
+                            <input id="pincode" class="form-control form-control-lg form-control-borderless"
+                                type="search" placeholder="Enter pin code" />
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <label class="form-check-label">Age:</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="age" id="age18" value="18" checked />
+                            <label class="form-check-label" for="age18">18+</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="age" id="age45" value="45" />
+                            <label class="form-check-label" for="age45">45+</label>
+                        </div>
+                        <!--end of col-->
+                        <div class="col-auto">
+                            <button id="btnCheckAvailability" class="btn btn-lg btn-success" type="button">
+                                Check availability
+                            </button>
+                        </div>
+                        <!--end of col-->
+                    </div>
+                </form>
+            </div>
+            <!--end of col-->
+        </div>
+        <br>
+        <div id="tablediv" class="table-responsive">
+            <table id="table" class="table-striped border-success">
+                <thead>
+                    <tr>
+                        <th data-field="centerName">
+                            <span class="text-success"> Center Name </span>
+                        </th>
+                        <th data-field="date">
+                            <span class="text-success"> Date </span>
+                        </th>
+                        <th data-field="availableCapacity">
+                            <span class="text-success"> Available Capacity </span>
+                        </th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</body>
+<script>
+    $("#table").bootstrapTable({
+        data: [],
+        autoRefresh: true,
+    });
+    document
+        .getElementById("btnCheckAvailability")
+        .addEventListener("click", function () {
+            var pincode = document.getElementById("pincode").value;
+            const date = moment(new Date()).format("DD-MM-YYYY");
+            var url =
+                "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode=" +
+                pincode +
+                "&date=" +
+                date;
+
+            $.ajax({
+                method: "GET",
+                url: url,
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (responseJson) {
+                    if (responseJson.centers) {
+                        var availabilityData = [];
+                        var centers = responseJson["centers"];
+                        var age = document.getElementById("age18").checked ? 18 : 45;
+                        centers.forEach((center) => {
+                            center.sessions.forEach((session) => {
+                                if (
+                                    session.available_capacity > 0 &&
+                                    session.min_age_limit == age
+                                ) {
+                                    var availableSession = {
+                                        centerName: center.name,
+                                        date: session.date,
+                                        availableCapacity: session.available_capacity,
+                                    };
+                                    availabilityData.push(availableSession);
+                                }
+                            });
+                        });
+                        // $("#tablediv").removeClass('d-none');
+                        $('#table').bootstrapTable("load", availabilityData);
+                    } else {
+                        alert("Center(s) not available!");
+                    }
+                },
+                error: function (jqxhr, textStatus, error) {
+                    if (jqxhr.status == 400) {
+                        alert("Invalid pincode!");
+                    } else {
+                        alert("CoWIN server not available!");
+                    }
+                }
+            })
+        });
+</script>
+
+</html>
