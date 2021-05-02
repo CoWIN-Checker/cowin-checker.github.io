@@ -6,15 +6,15 @@
     <meta charset="utf-8" />
     <meta name="description" content="Quick way to check CoWIN vaccine center(s) availability.">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet"
-        id="bootstrap-css" />
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"
-        integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ=="
-        crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.css" />
-    <script src="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-table@1.18.3/dist/bootstrap-table.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.18.3/dist/bootstrap-table.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/min/moment.min.js"></script>
 </head>
 
 <body>
@@ -25,26 +25,69 @@
         </div>
         <br />
         <form>
-            <div class="form-row align-items-center">
+            <div class="form-row">
                 <div class="col-auto">
+                    <label class="form-check-label mb-3 font-weight-bold mr-2">Age </label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input mb-3" type="radio" name="age" id="age18" value="18" checked />
+                    <label class="form-check-label mb-3" for="age18">18+</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input mb-3" type="radio" name="age" id="age45" value="45" />
+                    <label class="form-check-label mb-3" for="age45">45+</label>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col-auto">
+                    <label class="form-check-label mb-3 font-weight-bold mr-2">Search By</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input id="searchbypincode" class="form-check-input mb-3" type="radio" name="searchBy"
+                        value="pincode" checked />
+                    <label class="form-check-label mb-3" for="searchpincode">Pincode</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input id="searchbydistrict" class="form-check-input mb-3" type="radio" name="searchBy"
+                        value="district" />
+                    <label class="form-check-label mb-3" for="searchdistrict">District</label>
+                </div>
+            </div>
+            <div class="form-row">
+                <div id="pincodeGroup" class="col-auto">
                     <input id="pincode" class="form-control mb-3" type="text" placeholder="Pincode" />
                 </div>
-                <div class="col-auto">
-                    <div class="form-check form-check-inline">
-                        <label class="form-check-label mb-3">Age</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input mb-3" type="radio" name="age" id="age18" value="18" checked />
-                        <label class="form-check-label mb-3" for="age18">18+</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input mb-3" type="radio" name="age" id="age45" value="45" />
-                        <label class="form-check-label mb-3" for="age45">45+</label>
-                    </div>
+                <div id="districtGroup" class="col-auto d-none">
+                    <select id="selectState" class="form-control selectpicker mb-3 border" data-live-search="true"
+                        data-size="10" data-width="250px" data-style="btn-default" title="Select state">
+                    </select>
+                    <select id="selectDistrict" class="form-control selectpicker mb-3 border" data-live-search="true"
+                        data-size="10" data-width="250px" data-style="btn-default" title="Select district">
+                    </select>
                 </div>
                 <div class="col-auto">
-                    <button id="btnCheckAvailability" class="btn btn-success mb-3" type="button">Check
+                    <button id="btnCheckAvailability" class="btn btn-success mb-3" type="button"
+                        onclick='btnCheckAvailabilityCall()'>Check
                         availability</button>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col-auto">
+                    <div class="form-check form-check-inline">
+                        <input id="autocheck" class="form-check-input mb-3" type="checkbox" />
+                        <label class="form-check-label mb-3" for="autocheck">Auto check after every 5 minutes (Auto
+                            check will be disabled, once center is available.)</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col-auto">
+                    <div class="form-check form-check-inline">
+                        <input id="audioalert" class="form-check-input mb-3" type="checkbox" />
+                        <label class="form-check-label mb-3" for="audioalert">Audio alert when center is available. <a
+                                href="#" onclick='audioalert()'>click here to play audio sample</a> </label>
+
+                    </div>
                 </div>
             </div>
         </form>
@@ -76,16 +119,27 @@
         data: [],
         autoRefresh: true,
     });
-    document
-        .getElementById("btnCheckAvailability")
-        .addEventListener("click", function () {
-            var pincode = document.getElementById("pincode").value;
+
+    var timer = null;
+    function btnCheckAvailabilityCall() {
+        if (timer) {
+            window.clearTimeout(timer);
+            timer = null;
+        }
+        var isSearchByPincode = document.getElementById("searchbypincode").checked;
+        const audioAlertEnable = document.getElementById("audioalert").checked;
+        if (isSearchByPincode) {
+            var dataValue = document.getElementById("pincode").value.trim();
+        } else {
+            var dataValue = document.getElementById("selectDistrict").value;
+        }
+
+        const isValidData = (isSearchByPincode && dataValue?.length == 6) || (!isSearchByPincode && dataValue)
+
+        if (isValidData) {
             const date = moment(new Date()).format("DD-MM-YYYY");
-            var url =
-                "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode=" +
-                pincode +
-                "&date=" +
-                date;
+            var url = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/" + (isSearchByPincode ? "calendarByPin?pincode" : "calendarByDistrict?district_id") + "=" + dataValue + "&date=" + date;
+
             var availabilityData = [];
 
             $.ajax({
@@ -104,7 +158,7 @@
                                     session.min_age_limit == age
                                 ) {
                                     var availableSession = {
-                                        centerName: center.name,
+                                        centerName: center.name + " (" + center.fee_type + ")",
                                         date: session.date,
                                         availableCapacity: session.available_capacity,
                                     };
@@ -120,18 +174,65 @@
                     } else {
                         $("#notAvailableMessage").addClass('d-none');
                         $("#tablediv").removeClass('d-none');
+                        if (audioAlertEnable)
+                            audioalert();
+                        document.getElementById("autocheck").checked = false;
                     }
                     $('#table').bootstrapTable("load", availabilityData);
                 },
                 error: function (jqxhr, textStatus, error) {
                     if (jqxhr.status == 400) {
-                        alert("Invalid pincode!");
+                        alert("Invalid pincode or district!");
                     } else {
                         alert("CoWIN server not available!");
                     }
+                },
+                complete: function () {
+                    if (document.getElementById("autocheck").checked)
+                        timer = setTimeout(btnCheckAvailabilityCall, 1000 * 1 * 5);
                 }
             })
-        });
+        } else {
+            alert("Invalid pincode or district!");
+        }
+    };
+
+    $('#selectState').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+        if (isSelected) {
+            $.ajax({
+                type: "GET",
+                url: "https://cdn-api.co-vin.in/api/v2/admin/location/districts/" + this.value,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    $('#selectDistrict').empty();
+                    $.each(data.districts, function () {
+                        var options = "<option " + "value='" + this.district_id + "'>" + this.district_name + "";
+                        $("#selectDistrict").append(options);
+                    });
+                    $('#selectDistrict').selectpicker('refresh');
+                },
+                failure: function () { alert("CoWIN server not available!"); }
+            });
+        }
+    });
+
+    $('input[type=radio][name=searchBy]').change(function () {
+        if (this.value == 'district') {
+            $("#pincodeGroup").addClass('d-none');
+            $("#districtGroup").removeClass('d-none');
+        }
+        else {
+            $("#pincodeGroup").removeClass('d-none');
+            $("#districtGroup").addClass('d-none');
+        }
+    });
+
+    $('input[type=checkbox][id=autocheck]').change(function () {
+        if (this.checked) {
+            btnCheckAvailabilityCall();
+        }
+    });
 
     $(document).ready(function () {
         var url = new URL(document.location);
@@ -144,9 +245,14 @@
         if (age && age == 45) {
             document.getElementById("age45").checked = true;
         }
-        var check = params.get("check");
-        if (check) {
+        var autocheck = params.get("autocheck");
+        if (autocheck) {
+            document.getElementById("autocheck").checked = true;
             $("#btnCheckAvailability").click();
+        }
+        var audioalert = params.get("audioalert");
+        if (audioalert) {
+            document.getElementById("audioalert").checked = true;
         }
 
         $('#pincode').keypress(function (e) {
@@ -158,6 +264,27 @@
             }
         });
     });
+
+    $.ajax({
+        type: "GET",
+        url: "https://cdn-api.co-vin.in/api/v2/admin/location/states",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function (data) {
+            $.each(data.states, function () {
+                var options = "<option " + "value='" + this.state_id + "'>" + this.state_name + "";
+                $("#selectState").append(options);
+            });
+            $('#selectState').selectpicker('refresh');
+        },
+        failure: function () { alert("CoWIN server not available!"); }
+    });
+
+    function audioalert() {
+        const msg = new SpeechSynthesisUtterance("Vaccine center is now available.");
+        window.speechSynthesis.speak(msg);
+    };
+
 </script>
 
 </html>
