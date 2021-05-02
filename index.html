@@ -138,7 +138,7 @@
 
         if (isValidData) {
             const date = moment(new Date()).format("DD-MM-YYYY");
-            var url = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/" + (isSearchByPincode ? "calendarByPin?pincode" : "calendarByDistrict?district_id") + "=" + dataValue + "&date=" + date;
+            var url = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/" + (isSearchByPincode ? "calendarByPin?pincode" : "calendarByDistrict?district_id") + "=" + dataValue + "&date=" + date;
 
             var availabilityData = [];
 
@@ -183,8 +183,6 @@
                 error: function (jqxhr, textStatus, error) {
                     if (jqxhr.status == 400) {
                         alert("Invalid pincode or district!");
-                    } else {
-                        alert("CoWIN server not available!");
                     }
                 },
                 complete: function () {
@@ -211,8 +209,7 @@
                         $("#selectDistrict").append(options);
                     });
                     $('#selectDistrict').selectpicker('refresh');
-                },
-                failure: function () { alert("CoWIN server not available!"); }
+                }
             });
         }
     });
@@ -276,8 +273,7 @@
                 $("#selectState").append(options);
             });
             $('#selectState').selectpicker('refresh');
-        },
-        failure: function () { alert("CoWIN server not available!"); }
+        }
     });
 
     function audioalert() {
