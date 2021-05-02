@@ -108,6 +108,9 @@
                         <th data-field="availableCapacity">
                             <span class="text-success"> Available Capacity </span>
                         </th>
+                        <th data-field="googlemaplink" data-formatter="LinkFormatter">
+                            <span class="text-success"> Google Map </span>
+                        </th>
                     </tr>
                 </thead>
             </table>
@@ -115,6 +118,10 @@
     </div>
 </body>
 <script>
+    function LinkFormatter(value, row, index) {
+    return "<a href='"+value+"' target='_blank'>View Map</a>";
+    }
+
     $("#table").bootstrapTable({
         data: [],
         autoRefresh: true,
@@ -161,6 +168,7 @@
                                         centerName: center.name + " - " + center.block_name + " - " + center.pincode + " (" + center.fee_type + ")",
                                         date: session.date,
                                         availableCapacity: session.available_capacity,
+                                        googlemaplink: "https://www.google.com/maps/search/" + center.name + " " + center.pincode,
                                     };
                                     availabilityData.push(availableSession);
                                 }
