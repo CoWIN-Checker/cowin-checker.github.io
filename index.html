@@ -75,7 +75,7 @@
                 <div class="col-auto">
                     <div class="form-check form-check-inline">
                         <input id="autocheck" class="form-check-input mb-3" type="checkbox" />
-                        <label class="form-check-label mb-3" for="autocheck">Auto check after every 5 minutes (Auto
+                        <label class="form-check-label mb-3" for="autocheck">Auto check after every 1 minute (Auto
                             check will be disabled, once center is available.)</label>
                     </div>
                 </div>
@@ -138,7 +138,7 @@
 
         if (isValidData) {
             const date = moment(new Date()).format("DD-MM-YYYY");
-            var url = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/" + (isSearchByPincode ? "calendarByPin?pincode" : "calendarByDistrict?district_id") + "=" + dataValue + "&date=" + date;
+            var url = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/" + (isSearchByPincode ? "calendarByPin?pincode" : "calendarByDistrict?district_id") + "=" + dataValue + "&date=" + date;
 
             var availabilityData = [];
 
@@ -158,7 +158,7 @@
                                     session.min_age_limit == age
                                 ) {
                                     var availableSession = {
-                                        centerName: center.name + " (" + center.fee_type + ")",
+                                        centerName: center.name + " - " + center.block_name + " - " + center.pincode + " (" + center.fee_type + ")",
                                         date: session.date,
                                         availableCapacity: session.available_capacity,
                                     };
@@ -187,7 +187,7 @@
                 },
                 complete: function () {
                     if (document.getElementById("autocheck").checked)
-                        timer = setTimeout(btnCheckAvailabilityCall, 1000 * 60 * 5);
+                        timer = setTimeout(btnCheckAvailabilityCall, 1000 * 60 * 1);
                 }
             })
         } else {
