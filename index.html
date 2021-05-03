@@ -31,12 +31,25 @@
                     <label class="form-check-label mb-3 font-weight-bold mr-2">Age </label>
                 </div>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input mb-3" type="radio" name="age" id="age18" value="18" checked />
+                    <input class="form-check-input mb-3" type="checkbox" id="age18" value="18" checked />
                     <label class="form-check-label mb-3" for="age18">18+</label>
                 </div>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input mb-3" type="radio" name="age" id="age45" value="45" />
+                    <input class="form-check-input mb-3" type="checkbox" id="age45" value="45" />
                     <label class="form-check-label mb-3" for="age45">45+</label>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col-auto">
+                    <label class="form-check-label mb-3 font-weight-bold mr-2">Fees </label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input mb-3" type="checkbox" id="free" value="Free" checked />
+                    <label class="form-check-label mb-3" for="free">Free</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input mb-3" type="checkbox" id="paid" value="Paid" />
+                    <label class="form-check-label mb-3" for="paid">Paid</label>
                 </div>
             </div>
             <div class="form-row">
@@ -103,7 +116,10 @@
                     <tr>
                         <th data-field="centerName" data-sortable="true">Center Name</th>
                         <th data-field="date" data-sortable="true">Date</th>
-                        <th data-field="availableCapacity" data-sortable="true">Available Capacity</th>
+                        <th data-field="availableCapacity" data-sortable="true">Availability</th>
+                        <th data-field="age" data-sortable="true">Age</th>
+                        <th data-field="vaccine_fees" data-sortable="true" data-formatter="VaccineFeesFormatter">Vaccine
+                            - Fees</th>
                         <th data-field="googlemaplink" data-formatter="LinkFormatter">Google Map</th>
                     </tr>
                 </thead>
@@ -112,8 +128,21 @@
     </div>
 </body>
 <script>
-    function LinkFormatter(value, row, index) {
+    function LinkFormatter(value) {
         return "<a href='" + value + "' target='_blank'>View Map</a>";
+    }
+
+    function VaccineFeesFormatter(value) {
+        if (value) {
+            value.push(value[0])
+            val = "";
+            value.forEach((vaccineFee) => {
+                val += vaccineFee.vaccine + " - " + vaccineFee.fee + "\n";
+            });
+            return val;
+        }
+        else
+            return "-";
     }
 
     $("#table").bootstrapTable({
@@ -151,22 +180,29 @@
                 success: function (responseJson) {
                     if (responseJson.centers) {
                         var centers = responseJson["centers"];
-                        var age = document.getElementById("age18").checked ? 18 : 45;
+                        var age18Value = document.getElementById("age18").checked ? document.getElementById("age18").value : null;
+                        var age45Value = document.getElementById("age45").checked ? document.getElementById("age45").value : null;
+                        var freeValue = document.getElementById("free").checked ? document.getElementById("free").value : null;
+                        var paidValue = document.getElementById("paid").checked ? document.getElementById("paid").value : null;
                         centers.forEach((center) => {
-                            center.sessions.forEach((session) => {
-                                if (
-                                    session.available_capacity > 0 &&
-                                    session.min_age_limit == age
-                                ) {
-                                    var availableSession = {
-                                        centerName: center.name + " - " + center.block_name + " - " + center.pincode + " (" + center.fee_type + ")",
-                                        date: session.date,
-                                        availableCapacity: session.available_capacity,
-                                        googlemaplink: "https://www.google.com/maps/search/" + center.name + " " + center.pincode,
-                                    };
-                                    availabilityData.push(availableSession);
-                                }
-                            });
+                            if (center.fee_type == freeValue || center.fee_type == paidValue) {
+                                center.sessions.forEach((session) => {
+                                    if (
+                                        session.available_capacity > 0 &&
+                                        (session.min_age_limit == age18Value || session.min_age_limit == age45Value)
+                                    ) {
+                                        var availableSession = {
+                                            centerName: center.name + " - " + center.block_name + " - " + center.pincode + " (" + center.fee_type + ")",
+                                            date: session.date,
+                                            availableCapacity: session.available_capacity,
+                                            age: session.min_age_limit,
+                                            vaccine_fees: center.vaccine_fees,
+                                            googlemaplink: "https://www.google.com/maps/search/" + center.name + " " + center.pincode,
+                                        };
+                                        availabilityData.push(availableSession);
+                                    }
+                                });
+                            }
                         });
                     }
 
