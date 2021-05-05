@@ -100,9 +100,18 @@
                     <div class="form-check form-check-inline">
                         <input id="audioalert" class="form-check-input mb-3" type="checkbox" />
                         <label class="form-check-label mb-3" for="audioalert">Alert me when center is available.
-                            (Alert will be disabled once center is available) <a href="#"
-                                onclick='audioalert()'>click here to play alert sample</a> </label>
+                            (Alert will be disabled once center is available) <a href="#" onclick='audioalert()'>click
+                                here to play alert sample</a> </label>
 
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col-auto">
+                    <div class="form-check form-check-inline">
+                        <input id="opencowin" class="form-check-input mb-3" type="checkbox" />
+                        <label class="form-check-label mb-3" for="opencowin">Open CoWIN login page in new tab when
+                            center is available.</label>
                     </div>
                 </div>
             </div>
@@ -128,7 +137,8 @@
                 </thead>
             </table>
         </div>
-        <object type="image/svg+xml" data="https://gh-card.dev/repos/CoWIN-Checker/cowin-checker.github.io.svg?link_target=_blank"></object>
+        <object type="image/svg+xml"
+            data="https://gh-card.dev/repos/CoWIN-Checker/cowin-checker.github.io.svg?link_target=_blank"></object>
     </div>
 </body>
 <script>
@@ -220,6 +230,8 @@
                         if (audioAlertEnable)
                             audioalert();
                         document.getElementById("audioalert").checked = false;
+                        if (document.getElementById("opencowin").checked)
+                            window.open("https://selfregistration.cowin.gov.in/");
                     }
                     $('#table').bootstrapTable("load", availabilityData);
                 },
@@ -296,6 +308,10 @@
         var audioalert = params.get("audioalert");
         if (audioalert) {
             document.getElementById("audioalert").checked = true;
+        }
+        opencowin = params.get("opencowin");
+        if (opencowin) {
+            document.getElementById("opencowin").checked = true;
         }
 
         $('#pincode').keypress(function (e) {
