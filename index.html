@@ -182,7 +182,7 @@
 
         if (isValidData) {
             const date = moment(new Date()).format("DD-MM-YYYY");
-            var url = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/" + (isSearchByPincode ? "calendarByPin?pincode" : "calendarByDistrict?district_id") + "=" + dataValue + "&date=" + date;
+            var url = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/" + (isSearchByPincode ? "calendarByPin?pincode" : "calendarByDistrict?district_id") + "=" + dataValue + "&date=" + date;
 
             var availabilityData = [];
 
