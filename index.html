@@ -54,6 +54,28 @@
             </div>
             <div class="form-row">
                 <div class="col-auto">
+                    <label class="form-check-label mb-3 font-weight-bold mr-2">Dose </label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input mb-3" type="checkbox" id="dose1" value="1" checked />
+                    <label class="form-check-label mb-3" for="dose1">Dose 1</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input mb-3" type="checkbox" id="dose2" value="2" />
+                    <label class="form-check-label mb-3" for="dose2">Dose 2</label>
+                </div>
+            </div>
+            <div class="form-inline">
+                <label class="my-1 mr-2 mb-3 font-weight-bold" for="selectVaccine">Vaccine </label>
+                <select class="custom-select my-1 mr-2 mb-3" id="selectVaccine">
+                    <option value="ALL" selected>ALL</option>
+                    <option value="COVISHIELD">Covishield</option>
+                    <option value="COVAXIN">Covaxin</option>
+                    <option value="SUPTIN V">Sputnik V</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <div class="col-auto">
                     <label class="form-check-label mb-3 font-weight-bold mr-2">Search By</label>
                 </div>
                 <div class="form-check form-check-inline">
@@ -127,7 +149,9 @@
                     <tr>
                         <th data-field="centerName" data-sortable="true">Center Name</th>
                         <th data-field="date" data-sortable="true">Date</th>
-                        <th data-field="availableCapacity" data-sortable="true">Availability</th>
+                        <!-- <th data-field="availableCapacity" data-sortable="true">Availability</th> -->
+                        <th data-field="available_capacity_dose1" data-sortable="true">Dose 1 Availability</th>
+                        <th data-field="available_capacity_dose2" data-sortable="true">Dose 2 Availability</th>
                         <th data-field="age" data-sortable="true">Age</th>
                         <th data-field="vaccine" data-sortable="true">Vaccine Type</th>
                         <th data-field="vaccine_fees" data-sortable="true" data-formatter="VaccineFeesFormatter">Vaccine
@@ -178,7 +202,7 @@
             var dataValue = document.getElementById("selectDistrict").value;
         }
 
-        const isValidData = (isSearchByPincode && dataValue?.length == 6) || (!isSearchByPincode && dataValue)
+        const isValidData = (isSearchByPincode && dataValue?.length == 6) || (!isSearchByPincode && dataValue);
 
         if (isValidData) {
             const date = moment(new Date()).format("DD-MM-YYYY");
@@ -194,21 +218,27 @@
                 success: function (responseJson) {
                     if (responseJson.centers) {
                         var centers = responseJson["centers"];
-                        var age18Value = document.getElementById("age18").checked ? document.getElementById("age18").value : null;
-                        var age45Value = document.getElementById("age45").checked ? document.getElementById("age45").value : null;
-                        var freeValue = document.getElementById("free").checked ? document.getElementById("free").value : null;
-                        var paidValue = document.getElementById("paid").checked ? document.getElementById("paid").value : null;
+                        const vaccine = document.getElementById("selectVaccine").value;
+                        const dose1checked = document.getElementById("dose1").checked;
+                        const dose2checked = document.getElementById("dose2").checked;
+                        const age18Value = document.getElementById("age18").checked ? document.getElementById("age18").value : null;
+                        const age45Value = document.getElementById("age45").checked ? document.getElementById("age45").value : null;
+                        const freeValue = document.getElementById("free").checked ? document.getElementById("free").value : null;
+                        const paidValue = document.getElementById("paid").checked ? document.getElementById("paid").value : null;
                         centers.forEach((center) => {
                             if (center.fee_type == freeValue || center.fee_type == paidValue) {
                                 center.sessions.forEach((session) => {
                                     if (
-                                        session.available_capacity > 0 &&
-                                        (session.min_age_limit == age18Value || session.min_age_limit == age45Value)
+                                        ((dose1checked && session.available_capacity_dose1 > 0) || (dose2checked && session.available_capacity_dose2 > 0))
+                                        && (session.min_age_limit == age18Value || session.min_age_limit == age45Value)
+                                        && (vaccine == "ALL" || vaccine == session.vaccine)
                                     ) {
                                         var availableSession = {
                                             centerName: center.name + " - " + center.block_name + " - " + center.pincode,
                                             date: session.date,
                                             availableCapacity: session.available_capacity,
+                                            available_capacity_dose1: session.available_capacity_dose1,
+                                            available_capacity_dose2: session.available_capacity_dose2,
                                             age: session.min_age_limit,
                                             vaccine: session.vaccine,
                                             vaccine_fees: center.vaccine_fees,
