@@ -229,7 +229,7 @@
                             if (center.fee_type == freeValue || center.fee_type == paidValue) {
                                 center.sessions.forEach((session) => {
                                     if (
-                                        ((dose1checked && session.available_capacity_dose1 > 0) || (dose2checked && session.available_capacity_dose2 > 0))
+                                        (session.available_capacity > 0 && (dose1checked && session.available_capacity_dose1 > 0) || (dose2checked && session.available_capacity_dose2 > 0))
                                         && (session.min_age_limit == age18Value || session.min_age_limit == age45Value)
                                         && (vaccine == "ALL" || vaccine == session.vaccine)
                                     ) {
